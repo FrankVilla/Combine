@@ -49,4 +49,21 @@ print(justInteger)
 
 //#################################################################
 
+//Another example
+
+// We define a publication object that represents the current temperature
+@Published var temperaturaActual: Double = 0.0
+
+// We created a subscription to receive temperature updates
+cancellable = locationManager.$ubicacionActual
+    // We map the location to the current temperature using a weather API.
+    .flatMap { ubicacion in
+        URLSession.shared.dataTaskPublisher(for: climaAPI.obtenerTemperaturaActual(ubicacion: ubicacion))
+            .map { $0.data }
+            .decode(type: Clima.self, decoder: JSONDecoder())
+            .map { $0.temperatura }
+    }
+    // We update the publication object with the current temperature.
+    .assign(to: \.temperaturaActual, on: self)
+
 
